@@ -1,34 +1,44 @@
-import React from 'react';
-import axios from 'axios';
-import { sensors, addSensor } from './IndexSensor.js';
-import SensorService from './SensorService';
+import React, { PureComponent }           from 'react';
+import uuidv4 							  from 'uuid/v4';
+import { connect }                        from 'react-redux'; 
+import { getSensorData, getSensorDataWithID } 	from '../actions/Actions'
+import { createStructuredSelector }       from 'reselect';
+import { selectSensorData }  from '../selectors';
 
-class SensorModel extends React.Component {
-
-	constructor(props) {
-		super(props);
-		this.state = {value: ''};
-		this.addSensorService = new SensorService
+class SensorModel extends PureComponent {
+	
+	componentDidMount(){
+		this.props.getSensorData(this.props.sensor_id);
 	}
-
-	componentWillMount() {
-		axios.get('http://parkingapp.bsyes82dni.us-east-1.elasticbeanstalk.com/sensor/5a104cbd96bd8a44db6e9255/session/sensor')
-		.then(response => {
-			this.setState({ value: response.data });
-		})
-		.catch(function(error) {
-			console.log(error);
-		})
-	}
-
-	render() { 
-		addSensor(this.state.value);
+	
+	render() {
+		const sensor = this.props.sensorData.map((data)=>{
+           return <div key={ uuidv4 }> { JSON.stringify(data) } </div>
+       	})
 		return (
 			<div>
-				<h2>{sensors[0].owner}</h2>
+				{ sensor }
 			</div>
 		);
-	}
+  	}
 }
 
-export default SensorModel
+const structuredSelector = createStructuredSelector({
+    sensorData: selectSensorData,
+})
+const mapDispatchToProps = dispatch => {
+   return {
+     getSensorData: (sensor_id) => {
+     	if (sensor_id !== undefined) {
+     		dispatch(getSensorDataWithID(sensor_id));
+     	} else {
+     		dispatch(getSensorData());	
+     	}
+     }
+   }       
+}
+
+export default connect(
+  structuredSelector,
+  mapDispatchToProps
+)(SensorModel)
