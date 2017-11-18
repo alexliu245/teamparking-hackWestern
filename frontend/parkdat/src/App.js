@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import './App.css';
 import './index.js';
 import SensorModel from './components/SensorModel';
+import OwnerModel from './components/OwnerModel';
 
 class App extends Component {
 
@@ -12,14 +13,10 @@ class App extends Component {
 		return (
 			<div>
 				<SensorModel></SensorModel>
+				<OwnerModel></OwnerModel>
 			</div>
 		);
 	}
 }
-
-ReactDOM.render(
-	<App />,
-	document.getElementById('root')
-);
 
 export default App;
