@@ -5,9 +5,13 @@ import {Navigation} from './components/Navbar.js';
 
 import './App.css';
 import './index.js';
+import SensorModel from './components/SensorModel';
+import OwnerModel from './components/OwnerModel';
 
 class App extends Component {
+
 	render() {
+		// const { sensor } = Model.getSensors();
 		return (
 			<div>
 				<Navigation></Navigation>
@@ -37,10 +41,5 @@ class App extends Component {
 		);
 	}
 }
-
-ReactDOM.render(
-	<App />,
-	document.getElementById('root')
-);
 
 export default App;
