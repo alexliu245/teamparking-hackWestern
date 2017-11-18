@@ -3,12 +3,15 @@ import ReactDOM from 'react-dom';
 
 import './App.css';
 import './index.js';
+import SensorModel from './components/SensorModel';
 
 class App extends Component {
+
 	render() {
+		// const { sensor } = Model.getSensors();
 		return (
 			<div>
-				<h2>HOME</h2>
+				<SensorModel></SensorModel>
 			</div>
 		);
 	}
