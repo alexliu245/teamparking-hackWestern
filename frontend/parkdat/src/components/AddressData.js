@@ -25,11 +25,11 @@ export class AddressData extends React.Component {
     this.props.callbackFromParent(this.props.location, this.props.coordinates, this.props.owner, this.props.hourly_rental, this.props.status);
   }
   render() {
-    const style = {
-      padding: "50px 0 0 0" // why isnt this working tho
-    }
+    // const style = {
+    //   padding: "50px 0 0 0" // why isnt this working tho
+    // }
     return (
-      <div style={style}>
+      <div>
         <br />
         <div> <b> Address: </b> {this.props.location} </div>
         <div> <b> Coordinates: </b> {this.props.coordinates} </div>

@@ -22,7 +22,8 @@ class Owner extends React.Component {
         address: '',
         costPerHour:'',
         startTime:'',
-        endTime:''
+        endTime:'',
+        owner:''
       };
       // this.getLocationsService = new getLocationsService();
       this.handleAddressChange = this.handleAddressChange.bind(this);
@@ -32,6 +33,14 @@ class Owner extends React.Component {
       this.close = this.close.bind(this);
       this.open = this.open.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
+    }
+    componentDidMount(){
+      this.props.getSensorData();
+      console.log ("COMPONENT DID MOUNT");
+      console.log (this.props.sensorData);
+      this.setState({
+        sensorData: this.props.sensorData
+      });
     }
     close() {
       this.setState({ showModal: false });
@@ -55,12 +64,10 @@ class Owner extends React.Component {
       event.preventDefault();
       alert('SUBMITTED');
       this.close();
-      // this.props.getSensorData(); //sensorData
     }
 	render() {
-    this.props.getSensorData();
-    // console.log(this.props.sensorData);
-
+    console.log("OWNER PAGE -------")
+    console.log(this.props.sensorData);
     const style = {
       width : "80%",
       padding: "0 3%"
@@ -71,7 +78,7 @@ class Owner extends React.Component {
         <div className="container">
           <h2> Welcome Owner <small> & Hello World</small></h2>
           <p> Nice to have you back! Use the button below to add a new sensor, or check out your current sensors in the table :) </p>
-
+          {this.name}
           <Button
           bsStyle="primary"
           onClick={this.open}
@@ -79,7 +86,19 @@ class Owner extends React.Component {
           Add Sensor
         </Button>
 
+        {this.props.sensorData.map( ( res ) => {
+          return <div key={res.address}>
 
+                <div> <h4><u>{res.address} </u></h4></div>
+                <div> <b> Coordinates : </b> {res.location.coordinates}</div>
+                <div> <b> Hourly Rental: </b>{res.hourly_rental} </div>
+                <div> <b> Start Time: </b> {res.start_time} </div>
+                <div> <b> End Time: </b> {res.start_time} </div>
+                <div> <b> Status: </b> {res.session} </div>
+
+          </div>
+          })
+        }
           <Modal show={this.state.showModal} onHide={this.close}>
                 <Modal.Header closeButton>
                   <Modal.Title>Add Sensor Location</Modal.Title>
@@ -90,6 +109,7 @@ class Owner extends React.Component {
                       <Form
                         horizontal
                         onSubmit={this.handleSubmit}>
+
                         <FormGroup>
                           <ControlLabel>Address</ControlLabel>
                           <FormControl
@@ -135,7 +155,7 @@ class Owner extends React.Component {
 
 								<h3>Your Sensors</h3>
 
-                <SensorsTable />
+                <SensorsTable sensorData="this.state.sensorData"/>
 			</div>
 			</div>
 		);
@@ -154,106 +174,3 @@ export default connect(
   structuredSelector,
   mapDispatchToProps
 )(Owner)
-
-
-
-
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// import {FormControl, FormGroup, Button, Grid, Row, Col} from 'react-bootstrap';
-// import { Navigation } from '../components/Navbar.js';
-// import { AddressData } from '../components/AddressData.js';
-// import { connect } from 'react-redux';
-// import { getSensorData } from '../actions/Actions';
-// import { createStructuredSelector } from 'reselect';
-// import { selectSensorData } from '../selectors';
-//
-// // import {Map} from '../components/Gmap.js';
-// import '../index.js';
-// import '../App.css';
-//
-// class OwnerSensors extends React.Component {
-//   constructor(props) {
-//     super(props);
-    // this.state = {
-    //   value:''
-    // };
-//     // this.getLocationsService = new getLocationsService();
-    // this.handleChange = this.handleChange.bind(this);
-    // this.handleSubmit = this.handleSubmit.bind(this);
-    // this.myCallback = this.myCallback.bind(this);
-//   }
-//   handleChange(event) {
-//     this.setState({searchedAddress: event.target.value});
-//   }
-  // handleSubmit(event) {
-  //   event.preventDefault();
-  //   this.props.getSensorData(); //sensorData
-  // }
-//   render() {
-//     this.props.getSensorData();
-//     return (
-      // <div>
-      //   <Navigation></Navigation>
-        // <div className="container">
-        //   <h2> Welcome Client <small> & Hello World</small></h2>
-        //   <p> We're happy to see you! Simply enter your location below, and we'll find you a parking spot :) </p>
-      //
-      //     <form onSubmit={this.handleSubmit}>
-      //
-            // <FormGroup>
-            //   <ControlLabel>Address</ControlLabel>
-            //   <FormControl
-            //     type="text"
-            //     value={this.state.address}
-            //     onChange={this.handleChange}
-            //   />
-            // </FormGroup>
-            //
-            // <FormGroup>
-            //   <ControlLabel>Cost Per Hour</ControlLabel>
-            //   <FormControl
-            //     type="number"
-            //     value={this.state.costPerHour}
-            //     onChange={this.handleChange}
-            //   />
-            // </FormGroup>
-            //
-            // <FormGroup>
-            //   <ControlLabel>Start Time</ControlLabel>
-            //   <FormControl
-            //     type="text"
-            //     value={this.state.startTime}
-            //     onChange={this.handleChange}
-            //   />
-            // </FormGroup>
-            //
-            // <FormGroup>
-            //   <ControlLabel>End Time</ControlLabel>
-            //   <FormControl
-            //     type="text"
-            //     value={this.state.endTime}
-            //     onChange={this.handleChange}
-            //   />
-            // </FormGroup>
-            // <Button type="submit" value="Submit">Search</Button>
-      //     </form>
-      //
-      //   </div>
-//
-//       );
-//   	}
-//   }
-//
-// const structuredSelector = createStructuredSelector({
-//     sensorData: selectSensorData,
-// })
-// const mapDispatchToProps = dispatch => {
-//    return {
-//      getSensorData: () => dispatch(getSensorData())
-//    }
-// }
-// export default connect(
-//   structuredSelector,
-//   mapDispatchToProps
-// )(Client)

@@ -128,6 +128,7 @@ class Client extends React.Component {
                       owner = {res.owner}
                       hourly_rental = {res.hourly_rental}
                       start_time = {res.start_time}
+                      session = {res.session}
                       callbackFromParent={this.myCallback} />
                   </div>
                   })

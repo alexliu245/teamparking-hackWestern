@@ -9,10 +9,13 @@ import { selectSensorData } from '../selectors';
 let order = 'desc';
 const sensor_data = [];
 
-export default class SensorsTable extends React.Component {
+class SensorsTable extends React.Component {
   constructor(props){
     super(props);
-    this.state = { value: '', };
+    this.state = {
+      value: '',
+      sensorData:''
+    };
   }
   // ascending or descending sort on columns
   handleBtnClick = () => {
@@ -24,13 +27,24 @@ export default class SensorsTable extends React.Component {
       order = 'desc';
     }
   }
+  componentDidMount(){
+    this.props.getSensorData();
+    console.log(this.props.sensorData.address);
+    this.setState({
+      sensorData: this.props.sensorData
+    });
+  }
+
         render() {
+          console.log (this.state.sensorData);
           const options = {
             clearSearch: true,
             sortIndicator: false,  // disable sort indicator
           };
           // this.props.getSensorData();
           return (
+            <div>
+              {/* {this.state.sensorData} */}
             <BootstrapTable
               data={ sensor_data }
               options={ options }
@@ -43,7 +57,8 @@ export default class SensorsTable extends React.Component {
               <TableHeaderColumn dataField='id'
                 isKey={ true }
                 dataSort={ true }
-                editable={ false }>
+                editable={ false }
+                hidden>
                 Machine ID
               </TableHeaderColumn>
 
@@ -97,6 +112,20 @@ export default class SensorsTable extends React.Component {
               </TableHeaderColumn>
 
             </BootstrapTable>
+          </div>
           );
         }
       }
+
+      const structuredSelector = createStructuredSelector({
+          sensorData: selectSensorData,
+      })
+      const mapDispatchToProps = dispatch => {
+         return {
+           getSensorData: () => dispatch(getSensorData())
+         }
+      }
+      export default connect(
+        structuredSelector,
+        mapDispatchToProps
+      )(SensorsTable)
