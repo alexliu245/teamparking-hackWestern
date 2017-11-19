@@ -8,8 +8,9 @@ export class AddressData extends React.Component {
     this.state = {
       location: '',
       coordinates: '',
-      price: '',
-      status: '',
+      owner:'',
+      hourly_rental: '',
+      status: ''
     }
   };
   handleClick(e) {
@@ -17,18 +18,22 @@ export class AddressData extends React.Component {
     this.setState({
       location: this.props.location,
       coordinates: this.props.coordinates,
-      price: this.props.price,
+      owner: this.props.owner,
+      hourly_rental: this.props.hourly_rental,
       status: this.props.status
     });
-    this.props.callbackFromParent(this.props.location, this.props.coordinates, this.props.price, this.props.status);
+    this.props.callbackFromParent(this.props.location, this.props.coordinates, this.props.owner, this.props.hourly_rental, this.props.status);
   }
   render() {
+    const style = {
+      padding: "50px 0 0 0" // why isnt this working tho
+    }
     return (
-      <div>
+      <div style={style}>
         <br />
         <div> <b> Address: </b> {this.props.location} </div>
         <div> <b> Coordinates: </b> {this.props.coordinates} </div>
-        <div> <b> Price: </b> {this.props.price} </div>
+        <div> <b> Hourly price: </b> $ {this.props.hourly_rental} </div>
         <div> <b> Status: </b> {this.props.status} </div>
 
         <Button bsStyle="link" bsSize="small" onClick={this.handleClick} >

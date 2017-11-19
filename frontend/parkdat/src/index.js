@@ -9,6 +9,7 @@ import store from './store.js';
 import App from './App';
 import Client from './pages/Client';
 import Owner from './pages/Owner';
+import OwnerTransactions from './pages/OwnerTransactions.js';
 
 render(
 	<Provider store={store}>
@@ -17,8 +18,9 @@ render(
 				<Route exact path='/' component={App} />
 				<Route path='/client' component={Client} />
 				<Route path='/owner' component={Owner} />
+				<Route path='/owner-transactions' component={OwnerTransactions} />
 			</div>
 		</Router>
-	</Provider>, 
+	</Provider>,
 	document.getElementById('root')
 );
