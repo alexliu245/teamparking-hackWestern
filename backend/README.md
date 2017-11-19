@@ -14,7 +14,7 @@ returns {name: string}
 provide {name: string}
 
 [GET] at /sensor/<id>
-returns {owner: string, address: string, location: {type: Point, coordinates: [double, double]}, hourly_rental: float, start_bound: int, end_bound: int}
+returns {owner: string, address: string, location: {type: Point, coordinates: [double, double]}, hourly_rental: float, start_bound: int, end_bound: int, session: bool}
 
 [POST] at /sensor
 provide {owner: string, address: string, hourly_rental: float, start_bound: int, end_bound: int}
