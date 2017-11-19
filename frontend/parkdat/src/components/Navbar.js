@@ -18,10 +18,22 @@ export class Navigation extends React.Component {
       <Nav>
         <NavItem
 					eventKey={1}
-					href="/client">Client</NavItem>
+					href="/client">
+					Client
+				</NavItem>
+
         <NavItem
 					eventKey={2}
-					href="/owner">Owner-Parking Spots </NavItem>
+					href="/owner">
+					Manage Sensors
+				</NavItem>
+
+				<NavItem
+					eventKey={3}
+					href="/owner-transactions">
+					Transactions
+				</NavItem>
+
       </Nav>
       <Nav pullRight>
         <NavItem eventKey={2} href="/login">Logout</NavItem>
