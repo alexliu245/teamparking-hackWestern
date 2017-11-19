@@ -14,10 +14,10 @@ returns {name: string}
 provide {name: string}
 
 [GET] at /sensor/<id>
-returns {owner: string, address: string, location: {type: Point, coordinates: [double, double]}, hourly_rental: float}
+returns {owner: string, address: string, location: {type: Point, coordinates: [double, double]}, hourly_rental: float, start_bound: int, end_bound: int}
 
 [POST] at /sensor
-provide {owner: string, address: string}
+provide {owner: string, address: string, hourly_rental: float, start_bound: int, end_bound: int}
 
 [POST] at /assign/<customer_id>/<sensor_id>
 Assing customer to sensor for starting session provide nothing
