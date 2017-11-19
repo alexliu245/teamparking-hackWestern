@@ -1,18 +1,27 @@
 import React from 'react';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { connect } from 'react-redux';
-import { getSensorData } from '../actions/Actions';
+import { getTransactionData } from '../actions/Actions';
 import { createStructuredSelector } from 'reselect';
-import { selectSensorData } from '../selectors';
+import { selectTransactionData } from '../selectors';
 
 
 let order = 'desc';
 const sensor_transaction_data = [];
 
-export default class SensorTransactionTable extends React.Component {
+function reduceDecimals(num){
+  num = num.toFixed(2)
+  return `<i class='glyphicon glyphicon-usd'></i> ${num}`;
+}
+function priceFormatter(cell, row) {
+  return `<i class='glyphicon glyphicon-usd'></i> ${cell}.00`;
+}
+
+class SensorTransactionTable extends React.Component {
   constructor(props){
     super(props);
     this.state = { value: '', };
+    this.props.getTransactionData();
   }
   // ascending or descending sort on columns
   handleBtnClick = () => {
@@ -32,7 +41,7 @@ export default class SensorTransactionTable extends React.Component {
           // this.props.getSensorData();
           return (
             <BootstrapTable
-              data={ sensor_transaction_data }
+              data={ this.props.transactionData }
               options={ options }
               search={ true }
               multiColumnSearch={ true }
@@ -40,31 +49,19 @@ export default class SensorTransactionTable extends React.Component {
               ref='SensorsTransactionTable'
               pagination>
 
-              <TableHeaderColumn dataField='id'
+              <TableHeaderColumn
                 isKey={ true }
-                dataSort={ true }
-                editable={ false }>
-                Transaction ID
-              </TableHeaderColumn>
-
-              <TableHeaderColumn
                 dataField='address'
-                dataSort={ true }
-                editable={ true }>
-                Machine ID
-              </TableHeaderColumn>
-
-              <TableHeaderColumn
-                dataField='location.coordinates'
                 dataSort={ true }
                 editable={ false }>
                 Location
               </TableHeaderColumn>
 
               <TableHeaderColumn
-                dataField='cost'
+                dataField='hourly_rental'
                 dataSort={ true }
-                editable={ true }>
+                editable={ true }
+                dataFormat={ priceFormatter }>
                 Price Per Minute
               </TableHeaderColumn>
 
@@ -83,9 +80,11 @@ export default class SensorTransactionTable extends React.Component {
               </TableHeaderColumn>
 
               <TableHeaderColumn
-                dataField='earned'
+                dataField='value'
                 dataSort={ true }
-                editable={ false }>
+                editable={ false }
+                dataFormat={ reduceDecimals }
+                >
                 $ Earned
               </TableHeaderColumn>
 
@@ -93,3 +92,15 @@ export default class SensorTransactionTable extends React.Component {
           );
         }
       }
+      const structuredSelector = createStructuredSelector({
+          transactionData: selectTransactionData,
+      })
+      const mapDispatchToProps = dispatch => {
+         return {
+           getTransactionData: () => dispatch(getTransactionData())
+         }
+      }
+      export default connect(
+        structuredSelector,
+        mapDispatchToProps
+      )(SensorTransactionTable)

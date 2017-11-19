@@ -4,9 +4,9 @@ import {FormControl, FormGroup, ControlLabel, Button, Form, Modal} from 'react-b
 import {Navigation} from '../components/Navbar.js';
 import {AddressData} from '../components/AddressData.js';
 import { connect } from 'react-redux';
-import { getSensorData } from '../actions/Actions';
+import { getSensorData, postSensor } from '../actions/Actions';
 import { createStructuredSelector } from 'reselect';
-import { selectSensorData } from '../selectors';
+import { selectSensorData, selectSensorPostData } from '../selectors';
 import SensorsTable from '../components/OwnerSensorsTable.js';
 import '../index.js';
 import '../App.css';
@@ -23,8 +23,9 @@ class Owner extends React.Component {
         costPerHour:'',
         startTime:'',
         endTime:'',
-        owner:''
+        ownerID:'5a1182998113c9063dc1febc'
       };
+      this.props.getSensorData();
       // this.getLocationsService = new getLocationsService();
       this.handleAddressChange = this.handleAddressChange.bind(this);
       this.handleCostChange = this.handleCostChange.bind(this);
@@ -62,12 +63,13 @@ class Owner extends React.Component {
     }
     handleSubmit(event) {
       event.preventDefault();
-      alert('SUBMITTED');
+      this.props.postSensor(this.state.ownerID, this.state.address, this.state.costPerHour, this.state.startTime, this.state.endTime)
+      alert('SUBMITTED:' + this.state.ownerID + ' ' + this.state.address);
       this.close();
     }
 	render() {
-    console.log("OWNER PAGE -------")
-    console.log(this.props.sensorData);
+    // console.log("OWNER PAGE -------")
+    // console.log(this.props.sensorData);
     const style = {
       width : "80%",
       padding: "0 3%"
@@ -86,19 +88,19 @@ class Owner extends React.Component {
           Add Sensor
         </Button>
 
-        {this.props.sensorData.map( ( res ) => {
+        {/* {this.props.sensorData.map( ( res ) => {
           return <div key={res.address}>
 
                 <div> <h4><u>{res.address} </u></h4></div>
-                <div> <b> Coordinates : </b> {res.location.coordinates}</div>
+                <div> <b> Coordinates : </b> Latitude: {res.location.coordinates[0]} - Longitude: {res.location.coordinates[1]}</div>
                 <div> <b> Hourly Rental: </b>{res.hourly_rental} </div>
-                <div> <b> Start Time: </b> {res.start_time} </div>
-                <div> <b> End Time: </b> {res.start_time} </div>
+                <div> <b> Start Bound: </b> {res.start_bound}:00 </div>
+                <div> <b> End Bound: </b> {res.end_bound}:00 </div>
                 <div> <b> Status: </b> {res.session} </div>
 
           </div>
           })
-        }
+        } */}
           <Modal show={this.state.showModal} onHide={this.close}>
                 <Modal.Header closeButton>
                   <Modal.Title>Add Sensor Location</Modal.Title>
@@ -131,7 +133,7 @@ class Owner extends React.Component {
                         <FormGroup>
                           <ControlLabel>Start Time</ControlLabel>
                           <FormControl
-                            type="text"
+                            type="number"
                             value={this.state.startTime}
                             onChange={this.handleStartTChange}
                           />
@@ -140,13 +142,13 @@ class Owner extends React.Component {
                         <FormGroup>
                           <ControlLabel>End Time</ControlLabel>
                           <FormControl
-                            type="text"
+                            type="number"
                             value={this.state.endTime}
                             onChange={this.handleEndTChange}
                           />
                         </FormGroup>
 
-                        <Button type="submit" value="Submit" bsStyle="primary" pullRight>Add Sensor</Button>
+                        <Button type="submit" value="Submit" bsStyle="primary">Add Sensor</Button>
                       </Form>
                     </div>
                 </Modal.Body>
@@ -164,10 +166,13 @@ class Owner extends React.Component {
 
 const structuredSelector = createStructuredSelector({
     sensorData: selectSensorData,
+    sensorPostData: selectSensorPostData
 })
 const mapDispatchToProps = dispatch => {
    return {
-     getSensorData: () => dispatch(getSensorData())
+     getSensorData: () => dispatch(getSensorData()),
+     postSensor: (owner_id, address, hourly_rate, start_bound, end_bound) =>
+       dispatch(postSensor(owner_id, address, hourly_rate, start_bound, end_bound))
    }
 }
 export default connect(

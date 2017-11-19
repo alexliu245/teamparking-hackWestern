@@ -4,15 +4,16 @@ import {FormControl, FormGroup, InputGroup, Button, Grid, Row, Col} from 'react-
 import {Navigation} from '../components/Navbar.js';
 import {AddressData} from '../components/AddressData.js';
 import { connect } from 'react-redux';
-import { getSensorData } from '../actions/Actions';
+import { getSensorData, availableParkingSpots, assignCustomerToSensor, releaseSensorAssignment } from '../actions/Actions';
 import { createStructuredSelector } from 'reselect';
-import { selectSensorData } from '../selectors';
+import { selectSensorData, selectAvailableParkingSpot, selectCustomerToSensor, selectReleaseSensor} from '../selectors';
 import Gmap from '../components/Gmap.js';
 import '../index.js';
 import '../App.css';
 
 var isCheckedIn = "false";
 var showCheckInButton = "displayNone";
+var customerID = "5a1182988113c9063dc1feb8";
 
 class Client extends React.Component {
   constructor(props) {
@@ -23,6 +24,8 @@ class Client extends React.Component {
         selectedLocation: '',
         selectedCoordinates: '',
         currentTime: '',
+        customerID:'',
+        sensorID:'',
         isCheckedIn: "false",
         showCheckInButton: "displayNone",
         showCheckOutButton: "displayNone",
@@ -45,7 +48,7 @@ class Client extends React.Component {
         showCheckInButton: "displayNone",
         showSearch: "displayNone"
       });
-
+      this.props.assignToSensor(this.state.customerID, this.state.sensorID )
       // isCheckedIn = true;
       alert ("Checked into parking spot at " + this.state.selectedLocation + " at " + this.state.currentTime )
     }
@@ -60,14 +63,17 @@ class Client extends React.Component {
         showSearch: ''
 
       });
+      this.props.releaseSensorAssignment(this.state.sensorID)
       alert ("Checked out of parking spot at " + this.state.selectedLocation + " at " + this.state.currentTime )
     }
-    myCallback(location, coordinates, price, status){
+    myCallback(location, coordinates, price, status, customer, sensor){
       console.log ("Client has the data: " + location + "___" + coordinates + "___" + price + "___" + status );
       this.setState({
         selectedLocation: location,
         selectedCoordinates: coordinates,
-        showCheckInButton: ''
+        showCheckInButton: '',
+        customerID: customer,
+        sensorID: sensor
       });
       // showCheckInButton = 'displayNone';
     }
@@ -76,13 +82,15 @@ class Client extends React.Component {
     }
     handleSubmit(event) {
       event.preventDefault();
-      this.props.getSensorData();
+      // alert(this.state.searchedAddress)
+      // this.props.getSensorData();
+      this.props.availableParkingSpots(this.state.searchedAddress)
     }
 	render() {
     const style = {
     height: '50vh'
   }
-    console.log(this.props.sensorData);
+    // console.log(this.props.sensorData);
 		return (
 			<div>
 				<Navigation></Navigation>
@@ -120,7 +128,7 @@ class Client extends React.Component {
 				      <Col xs={12} md={4} lg={4}>
 								<h3>Parking Spots Near You</h3>
                 <div className= "overflow">
-                {this.props.sensorData.map( ( res ) => {
+                {this.props.availableParkingSpotData.map( ( res ) => {
                   return <div key={res.address}>
                     <AddressData
                       location={res.address}
@@ -144,10 +152,16 @@ class Client extends React.Component {
 
 const structuredSelector = createStructuredSelector({
     sensorData: selectSensorData,
+    availableParkingSpotData: selectAvailableParkingSpot,
+    customerToSensorData: selectCustomerToSensor,
+    releaseSensorData: selectReleaseSensor
 })
 const mapDispatchToProps = dispatch => {
    return {
-     getSensorData: () => dispatch(getSensorData())
+     getSensorData: () => dispatch(getSensorData()),
+     availableParkingSpots: (address) => dispatch(availableParkingSpots(address)),
+     releaseSensorAssignment: (sensor_id) => dispatch(releaseSensorAssignment(sensor_id)),
+     assignToSensor: (customer_id, sensor_id) => dispatch(assignCustomerToSensor(customer_id, sensor_id))
    }
 }
 export default connect(

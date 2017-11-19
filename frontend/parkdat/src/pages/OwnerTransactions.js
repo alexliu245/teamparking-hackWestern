@@ -1,12 +1,13 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
 // import {FormControl, FormGroup, ControlLabel, Button } from 'react-bootstrap';
+import uuidv4 							  from 'uuid/v4';
 import {Navigation} from '../components/Navbar.js';
 import {AddressData} from '../components/AddressData.js';
 import { connect } from 'react-redux';
-import { getSensorData } from '../actions/Actions';
+import { getTransactionData } from '../actions/Actions';
 import { createStructuredSelector } from 'reselect';
-import { selectSensorData } from '../selectors';
+import { selectTransactionData } from '../selectors';
 import SensorTransactionTable from '../components/OwnerTransactionsTable.js';
 import '../index.js';
 import '../App.css';
@@ -19,10 +20,20 @@ class OwnerTransactions extends React.Component {
       this.state = {
         value:''
     }
+    this.props.getTransactionData();
+  }
+  componentDidMount(){
+    this.props.getTransactionData();
+    console.log ("COMPONENT DID MOUNT");
+    console.log (this.props.transactionData);
+    this.setState({
+      transactionData: this.props.transactionData
+    });
   }
 	render() {
-    this.props.getSensorData();
-    // console.log(this.props.sensorData);
+    // this.props.getTransactionData();
+    // console.log("TRANSACTION DATA")
+    // console.log(this.props.transactionData);
 
     const style = {
       width : "80%",
@@ -33,6 +44,19 @@ class OwnerTransactions extends React.Component {
 				<Navigation></Navigation>
         <div className="container">
           <h2> Sensor Transactions </h2>
+          {/* {this.props.transactionData.map( ( res ) => {
+            return <div key={ uuidv4 }>
+              {console.log(this.props.transactionData)}
+                  <div> <h4><u>{res.address} </u></h4></div>
+                  <div> <b> Coordinates : </b> {res.location.coordinates}</div>
+                  <div> <b> Hourly Rental: </b>{res.hourly_rental} </div>
+                  <div> <b> Start Time: </b> {res.start_time} </div>
+                  <div> <b> End Time: </b> {res.start_time} </div>
+                  <div> <b> Earn: </b> $ {res.value} </div>
+
+            </div>
+            })
+          } */}
             <SensorTransactionTable />
 			</div>
 			</div>
@@ -41,11 +65,11 @@ class OwnerTransactions extends React.Component {
 }
 
 const structuredSelector = createStructuredSelector({
-    sensorData: selectSensorData,
+    transactionData: selectTransactionData,
 })
 const mapDispatchToProps = dispatch => {
    return {
-     getSensorData: () => dispatch(getSensorData())
+     getTransactionData: () => dispatch(getTransactionData())
    }
 }
 export default connect(

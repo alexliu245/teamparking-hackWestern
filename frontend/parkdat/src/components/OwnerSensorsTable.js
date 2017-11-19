@@ -9,6 +9,16 @@ import { selectSensorData } from '../selectors';
 let order = 'desc';
 const sensor_data = [];
 
+function priceFormatter(cell, row) {
+  return `<i class='glyphicon glyphicon-usd'></i> ${cell}.00`;
+}
+
+export function timeFormatter(cell, row) {
+  return `${cell}:00`;
+}
+
+
+
 class SensorsTable extends React.Component {
   constructor(props){
     super(props);
@@ -16,6 +26,7 @@ class SensorsTable extends React.Component {
       value: '',
       sensorData:''
     };
+    this.props.getSensorData();
   }
   // ascending or descending sort on columns
   handleBtnClick = () => {
@@ -36,7 +47,7 @@ class SensorsTable extends React.Component {
   }
 
         render() {
-          console.log (this.state.sensorData);
+          // console.log (this.state.sensorData);
           const options = {
             clearSearch: true,
             sortIndicator: false,  // disable sort indicator
@@ -46,7 +57,7 @@ class SensorsTable extends React.Component {
             <div>
               {/* {this.state.sensorData} */}
             <BootstrapTable
-              data={ sensor_data }
+              data={ this.props.sensorData }
               options={ options }
               search={ true }
               multiColumnSearch={ true }
@@ -72,40 +83,40 @@ class SensorsTable extends React.Component {
               <TableHeaderColumn
                 dataField='location.coordinates'
                 dataSort={ true }
-                editable={ false }>
+                editable={ false }
+                hidden>
                 Coordinates
               </TableHeaderColumn>
 
               <TableHeaderColumn
-                dataField='cost'
+                dataField='hourly_rental'
                 dataSort={ true }
-                editable={ true }>
-                Price Per Minute
+                editable={ true }
+                dataFormat={ priceFormatter}
+                >
+                Hourly Rental Price
               </TableHeaderColumn>
 
               <TableHeaderColumn
-                dataField='start_time'
+                dataField='start_bound'
                 dataSort={ true }
-                editable={false}>
+                editable={false}
+                dataFormat={ timeFormatter }
+                >
                 Start Time
               </TableHeaderColumn>
 
               <TableHeaderColumn
-                dataField='end_time'
+                dataField='end_bound'
                 dataSort={ true }
-                editable={ false }>
+                editable={ false }
+                dataFormat={ timeFormatter }
+                >
                 End Time
               </TableHeaderColumn>
 
               <TableHeaderColumn
-                dataField='earned'
-                dataSort={ true }
-                editable={ false }>
-                $ Earned
-              </TableHeaderColumn>
-
-              <TableHeaderColumn
-                dataField='status'
+                dataField='session'
                 dataSort={ true }
                 editable={ false }>
                 Status

@@ -32,7 +32,7 @@ export class AddressData extends React.Component {
       <div>
         <br />
         <div> <b> Address: </b> {this.props.location} </div>
-        <div> <b> Coordinates: </b> {this.props.coordinates} </div>
+        <div> <b> Coordinates: </b> lat: {this.props.coordinates[1]} lng: {this.props.coordinates[2]} </div>
         <div> <b> Hourly price: </b> $ {this.props.hourly_rental} </div>
         <div> <b> Status: </b> {this.props.status} </div>
 
