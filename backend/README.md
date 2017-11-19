@@ -1,3 +1,5 @@
+http://parkingapp.bsyes82dni.us-east-1.elasticbeanstalk.com/
+
 
 [GET] at /customer/<id>
 returns {name: string}
