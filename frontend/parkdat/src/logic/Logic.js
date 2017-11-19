@@ -9,7 +9,8 @@ import { updateSensorData,
         updateCustomerDataWithID,
         updateCustomerToSensor,
         updateSensorAssignment,
-        updateAvailableParkingSpots }    
+        updateAvailableParkingSpots,
+        updatePostSensor }    
 from '../actions/Actions';
 
 const getSensor = createLogic({
@@ -151,8 +152,28 @@ const availableParkingSpots = createLogic({
     type: "AVAILABLE_PARKING_SPOTS",
     async process({ getState, action, APIEndpoint }, dispatch, done) {
         try {
-            var result = await axios.get(APIEndpoint + "/available-parking-spots-near?lat=" + action.payload.lat + "&lng=" + action.payload.long);
+            var result = await axios.get(APIEndpoint + "available-parking-spots-near?lat=" + action.payload.lat + "&lng=" + action.payload.long);
             dispatch(availableParkingSpots(result.data));
+            done();
+        } catch (err) {
+            done();
+        }
+    }
+})
+
+const postSensor = createLogic({
+    
+    type: "POST_SENSOR",
+    async process({ getState, action, APIEndpoint}, dispatch, done) {
+        try {
+            var result = await axios.post(APIEndpoint + "sensor",
+                                        { owner: action.payload.ownerID, 
+                                        address: action.payload.address,
+                                        hourly_rental: action.payload.hourlyRental,
+                                        start_bound: action.payload.startBound,
+                                        end_bound: action.payload.endBound
+                                        });
+            dispatch(postSensor(result.data));
             done();
         } catch (err) {
             done();
@@ -170,5 +191,6 @@ export default [
     getCustomerWithID,
     assignCustomerToSensor,
     releaseSensorAssignment,
-    availableParkingSpots
+    availableParkingSpots,
+    postSensor
 ]
