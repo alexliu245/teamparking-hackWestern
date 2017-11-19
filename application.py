@@ -9,6 +9,7 @@ import requests
 import logging
 import pprint
 import json
+import os
 
 
 logger = logging.getLogger(__name__)
@@ -17,18 +18,15 @@ logger = logging.getLogger(__name__)
 application = Flask(__name__)
 CORS(application)
 
-production_url = "mongodb://western:parker77@parkingapp-shard-00-00-s0fvp.mongodb.net:27017," \
-                 "parkingapp-shard-00-01-s0fvp.mongodb.net:27017," \
-                 "parkingapp-shard-00-02-s0fvp.mongodb.net:27017/test?ssl=true&replicaSet=ParkingApp-shard-0&authSource=admin"
+client = MongoClient(os.getenv("DB_URL"))
 
-client = MongoClient(production_url)
-db = client.production
+db = client.production if os.getenv("ENVIRONMENT") == "production" else client.test
 owners = db.owners
 customers = db.customers
 sensors = db.sensors
 transactions = db.transactions
 
-maps = Client(key='AIzaSyDccw8C-y8tyB9izZb_OfwOpawLthxVb9Q')
+maps = Client(key=os.getenv("GOOGLE_MAPS_KEY"))
 
 
 @application.route("/")
@@ -74,7 +72,7 @@ def get_sensor(id):
     if sensor is not None:
         sensor["_id"] = str(sensor["_id"])
         sensor["owner"] = str(sensor["owner"])
-        sensor["session"] = ("start_time" in sensor) and ("end_time" not in sensor)
+        sensor["session"] = is_session_active(sensor)
         return jsonify(sensor)
     else:
         return jsonify({})
@@ -91,7 +89,7 @@ def get_sensors():
                 if "assigned_customer" in sensor:
                     sensor.pop("assigned_customer")
                 sensor["owner"] = str(sensor["owner"])
-                sensor["session"] = ("start_time" in sensor) and ("end_time" not in sensor)
+                sensor["session"] = is_session_active(sensor)
                 results.append(sensor)
         return jsonify(results)
     else:
@@ -104,6 +102,8 @@ def register_sensor():
     sensor = sensors.insert_one({
         "owner": ObjectId(request.form["owner"]),
         "address": request.form["address"],
+        "start_bound": request.form["start_bound"],
+        "end_bound": request.form["end_bound"],
         "location": {"type": "Point", "coordinates": [loc["lng"], loc["lat"]]},
         "hourly_rental": float(request.form["hourly_rental"])
     })
@@ -162,6 +162,7 @@ def release_sensor(sensor_id):
 
 @application.route("/sensor/<sensor_id>/session", methods=["POST"])
 def session(sensor_id):
+    sensor_id = "5a1182998113c9063dc1febc" # <<< WE CURRENTLY ONLY HAVE THIS SENSOR!
     sensor_id = ObjectId(sensor_id)
     detected_car, items, score = sensor_detected(sensor_id, request.form["url"])
     if detected_car:
@@ -170,9 +171,9 @@ def session(sensor_id):
                 {"_id": sensor_id},
                 {"$set": {"start_time": datetime.now()}}
             )
-            return "Car Detected - Session Created"
+            return ("Car Detected (Score %d) - Session Created\n" % score) + pprint.pformat(items)
         else:
-            return "Car Detected - Session was already opened"
+            return ("Car Detected (Score %d) - Session was already opened\n" % score) + pprint.pformat(items)
     else:
         if session_is_open(sensor_id):
             sensor_session = close_session(sensor_id)
@@ -182,7 +183,7 @@ def session(sensor_id):
             return ("Car not Detected (Score %d)  - No Session to End\n" % score) + pprint.pformat(items)
 
 
-@application.route("/available-parking-spots-near")
+@application.route("/available-parking-spots-near", methods=["GET"])
 def available_parking_spots_near():
     geo_query = {
      "location": {
@@ -215,6 +216,36 @@ def available_parking_spots_near():
         return jsonify({})
 
 
+@application.route("/transactions")
+def get_transactions():
+    transactions_ = transactions.find()
+    if transactions_ is None:
+        return jsonify({})
+    result = []
+    for transaction in transactions_:
+        transaction["_id"] = str(transaction["_id"])
+        transaction["owner"] = str(transaction["owner"])
+        transaction["sensor_id"] = str(transaction["sensor_id"])
+        transaction["assigned_customer"] = str(transaction["assigned_customer"])
+        result.append(transaction)
+    return jsonify(result)
+
+
+@application.route("/transactions/<owner_id>")
+def get_transactions_by_owner(owner_id):
+    transactions_ = transactions.find({"owner": ObjectId(owner_id)})
+    if transactions_ is None:
+        return jsonify({})
+    result = []
+    for transaction in transactions_:
+        transaction["_id"] = str(transaction["_id"])
+        transaction["owner"] = str(transaction["owner"])
+        transaction["sensor_id"] = str(transaction["sensor_id"])
+        transaction["assigned_customer"] = str(transaction["assigned_customer"])
+        result.append(transaction)
+    return jsonify(result)
+
+
 def try_get_geocode(address):
     try:
         return get_geocode(address)
@@ -236,9 +267,11 @@ def sensor_detected(sensor_id, url):
 
 def session_is_open(sensor_id):
     open_session = {
-        "_id": sensor_id,
-        "assigned_customer": {"$exists": True},
-        "start_time": {"$exists": True}
+        "$and": [
+            {"_id": sensor_id},
+            {"assigned_customer": {"$exists": True}},
+            {"start_time": {"$exists": True}}
+        ]
     }
     return sensors.find_one(open_session) is not None
 
@@ -255,7 +288,7 @@ def close_session(sensor_id):
 def record_transaction(sensor):
     lng, lat = sensor["location"]["coordinates"]
     transaction = sensor
-    transaction.pop("_id")
+    transaction["sensor_id"] = sensor["_id"]
     transaction["end_time"] = datetime.now()
     transaction["duration_in_hours"] = (
         transaction["end_time"] - transaction["start_time"]
@@ -264,14 +297,11 @@ def record_transaction(sensor):
         transaction["duration_in_hours"] * transaction["hourly_rental"]
     )
     transaction["weather"] = try_get_weather(lng, lat)
-    transactions.insert_one(sensor)
+    transactions.insert_one(transaction)
 
 
 def is_this_a_car_watson(sensor_id, camera_snapshot_url):
-    vis = VisualRecognitionV3(
-        '2017-11-18',
-        api_key='8d7aced8efa9ce11cca985d203dce5989cc20148'
-    )
+    vis = VisualRecognitionV3('2017-11-18', api_key=os.getenv("WATSON_KEY"))
     # try:
     result = vis.classify(
         parameters=json.dumps({'url': camera_snapshot_url})
@@ -289,9 +319,10 @@ def is_this_a_car_watson(sensor_id, camera_snapshot_url):
 def is_a_vehicle_class(item_class):
     VEHICLES = set(['car', 'truck', 'vehicle'])
     for vehicle_class in VEHICLES:
-        if VEHICLES in item_class:
+        if vehicle_class in item_class.split(" "):
             return True
     return False
+
 
 def try_get_weather(lat, lng):
     try:
@@ -311,6 +342,12 @@ def get_weather(lat, lng):
         "visibility": weather["visibility"]
     }
 
+
+def is_place_available(sensor):
+    if ("start_time" in sensor) and ("end_time" not in sensor):
+        return "UNAVAILABLE"
+    else:
+        return "AVAILABLE"
 
 # run the app.
 if __name__ == "__main__":
