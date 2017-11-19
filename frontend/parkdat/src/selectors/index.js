@@ -7,3 +7,4 @@ export const selectCustomerToSensor = state => state.reducer.customerToSensorDat
 export const selectReleaseSensor = state => state.reducer.releaseSensorData;
 export const selectAvailableParkingSpot = state => state.reducer.availableParkingSpotData;
 export const selectSensorPostData = state => state.reducer.postSensorData;
+export const selectTransactionData = state => state.reducer.transactionData;

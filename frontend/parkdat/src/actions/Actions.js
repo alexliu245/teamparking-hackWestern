@@ -149,3 +149,30 @@ export const updatePostSensor = (res) => {
         payload: res
     }
 }
+
+// /transactions GET
+export const getTransactionData = () => {
+    return {
+        type: 'GET_TRANSACTION_DATA',
+    }
+}
+export const updateTransactionData = (res) => {
+    return {
+        type: 'UPDATE_TRANSACTION_DATA',
+        payload: res
+    }
+}
+
+// /transactions/<owner_id> GET
+export const getTransactionDataWithID = (ownerID) => {
+    return {
+        type: 'GET_TRANSACTION_DATA_WITH_ID',
+        payload: ownerID
+    }
+}
+export const updateTransactionDataWithID = (res) => {
+    return {
+        type: 'UPDATE_TRANSACTION_DATA_WITH_ID',
+        payload: res
+    }
+}

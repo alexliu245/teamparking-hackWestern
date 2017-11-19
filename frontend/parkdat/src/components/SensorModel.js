@@ -11,8 +11,8 @@ class SensorModel extends PureComponent {
     if (this.props.ownerID === undefined) {
       this.props.getSensorData(this.props.sensor_id);
     } else {
-      this.props.postSensorData(this.props.ownerID, this.props.address,
-                                this.props.hourlyRate, this.props.startBound,
+      this.props.postSensor(this.props.ownerID, this.props.address,
+                                this.props.hourlyRental, this.props.startBound,
                                 this.props.endBound);
     }
 	}

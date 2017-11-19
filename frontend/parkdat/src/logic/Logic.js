@@ -1,5 +1,6 @@
 import { createLogic }      from 'redux-logic';
 import axios                from 'axios';
+import qs from 'qs'
 import { updateSensorData, 
         updateSensorDataWithID, 
         updateOwnerData, 
@@ -10,7 +11,9 @@ import { updateSensorData,
         updateCustomerToSensor,
         updateSensorAssignment,
         updateAvailableParkingSpots,
-        updatePostSensor }    
+        updatePostSensor,
+        updateTransactionData,
+        updateTransactionDataWithID }    
 from '../actions/Actions';
 
 const getSensor = createLogic({
@@ -62,8 +65,10 @@ const postCustomer = createLogic({
         try {
             console.log(action.payload);
             var result = await axios.post(APIEndpoint + 'customer',
-                                        { name: action.payload });
-            dispatch(updateCustomerPostData(result.data));
+                                        qs.stringify({ name: action.payload }));
+            dispatch(updateCustomerPostData([{
+                customerID: result.data
+            }]));
             done();
         } catch(err) {
             done();
@@ -76,14 +81,11 @@ const postOwner = createLogic({
     type: 'POST_OWNER_DATA',
     async process({ getState, action, APIEndpoint }, dispatch, done) {
         try {
-            var result = await axios({
-                            method: 'post',
-                            url: APIEndpoint + 'owner',
-                            data:{ name: "dammit" }
-                        });
-            // var result = await axios.post(APIEndpoint + 'owner',
-            //                             { name : action.payload });
-            dispatch(updateOwnerPostData(result.data));
+            var result = await axios.post(APIEndpoint + 'owner',
+                                        qs.stringify({ name : 'rafael' }));
+            dispatch(updateOwnerPostData([{
+                ownerID: result.data
+            }]));
             done();
         } catch (err) {
             done();
@@ -124,8 +126,11 @@ const assignCustomerToSensor = createLogic({
     type: "ASSIGN_CUSTOMER_TO_SENSOR",
     async process({ getState, action, APIEndpoint }, dispatch, done) {
         try {
-            var result = await axios.post(APIEndpoint + 'assign/' + action.payload.customer_id + '/' + action.payload.sensor_id, {});
-            dispatch(updateCustomerToSensor(result.data));
+            var result = await axios.post(APIEndpoint + 'assign/' + action.payload.customer_id + '/' + action.payload.sensor_id, 
+                                        qs.stringify({}));
+            dispatch(updateCustomerToSensor([{
+                result: result.data
+            }]));
             done();
         } catch (err) {
             done();
@@ -138,8 +143,11 @@ const releaseSensorAssignment = createLogic({
     type: "RELEASE_SENSOR_ASSIGNMENT",
     async process({ getState, action, APIEndpoint }, dispatch, done) {
         try {
-            var result = await axios.post(APIEndpoint + 'release/' + action.payload, {});
-            dispatch(updateSensorAssignment(result.data));
+            var result = await axios.post(APIEndpoint + 'release/' + action.payload, 
+                                        qs.stringify({}));
+            dispatch(updateSensorAssignment([{
+                result: result.data
+            }]));
             done();
         } catch (err) {
             done();
@@ -164,16 +172,46 @@ const availableParkingSpots = createLogic({
 const postSensor = createLogic({
     
     type: "POST_SENSOR",
-    async process({ getState, action, APIEndpoint}, dispatch, done) {
+    async process({ getState, action, APIEndpoint }, dispatch, done) {
         try {
             var result = await axios.post(APIEndpoint + "sensor",
-                                        { owner: action.payload.ownerID, 
+                                        qs.stringify({ owner: action.payload.ownerID, 
                                         address: action.payload.address,
                                         hourly_rental: action.payload.hourlyRental,
                                         start_bound: action.payload.startBound,
                                         end_bound: action.payload.endBound
-                                        });
-            dispatch(postSensor(result.data));
+                                        }));
+            dispatch(postSensor([{
+                sensorID: result.data
+            }]));
+            done();
+        } catch (err) {
+            done();
+        }
+    }
+})
+
+const getTransaction = createLogic({
+
+    type: "GET_TRANSACTION_DATA",
+    async process({ getState, action, APIEndpoint }, dispatch, done) {
+        try {
+            var result = await axios.get(APIEndpoint + "transactions");
+            dispatch(getTransaction(result.data));
+            done();
+        } catch (err) {
+            done();
+        }
+    }
+})
+
+const getTransactionWithID = createLogic({
+
+    type: "GET_TRANSACTION_DATA_WITH_ID",
+    async process({ getState, action, APIEndpoint }, dispatch, done) {
+        try {
+            var result = await axios.get(APIEndpoint + "transactions/" + action.payload);
+            dispatch(getTransactionWithID(result.data));
             done();
         } catch (err) {
             done();
@@ -192,5 +230,7 @@ export default [
     assignCustomerToSensor,
     releaseSensorAssignment,
     availableParkingSpots,
-    postSensor
+    postSensor,
+    getTransaction,
+    getTransactionWithID
 ]

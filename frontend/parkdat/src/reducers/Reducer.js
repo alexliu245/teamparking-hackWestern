@@ -9,7 +9,9 @@ const initialState = {
     customerToSensorData: [],
     releaseSensorData: [],
     availableParkingSpotData: [],
-    postSensorData: []
+    postSensorData: [],
+    transactionData: [],
+    transactionDataWithID: []
 }
 
 // All entries must be paired with a "UPDATE_XXXX" action.
@@ -142,6 +144,28 @@ export default function actionsReducer(state = initialState, action) {
             return {
                 ...state,
                 postSensorData: action.payload
+            }
+
+        // /transactions GET
+        case 'GET_TRANSACTION_DATA':
+            return {
+                ...state
+            }
+        case 'UPDATE_TRANSACTION_DATA':
+            return {
+                ...state,
+                transactionData: action.payload
+            }
+
+        // /transactions/<owner_id> GET
+        case 'GET_TRANSACTION_DATA_WITH_ID':
+            return {
+                ...state
+            }
+        case 'UPDATE_TRANSACTION_DATA_WITH_ID':
+            return {
+                ...state,
+                transactionDataWithID: action.payload
             }
     }
 }
