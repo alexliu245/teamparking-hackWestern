@@ -7,6 +7,9 @@ import './App.css';
 import './index.js';
 import SensorModel from './components/SensorModel';
 import OwnerModel from './components/OwnerModel';
+import CustomerModel from './components/CustomerModel';
+import AvailabilityModel from './components/AvailabilityModel';
+import AssignModel from './components/AssignModel';
 
 class App extends Component {
 
