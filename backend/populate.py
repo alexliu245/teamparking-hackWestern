@@ -1,4 +1,5 @@
 import requests
+from random import randint
 import json
 
 names = ['Rafael', 'Alex', 'Tori', 'Raj']
@@ -13,7 +14,7 @@ for n in names:
 
 i = 0
 for s in sensors:
-    s = requests.post(url='http://parkingapp.bsyes82dni.us-east-1.elasticbeanstalk.com/sensor', data={'owner': ownerIDs[i], 'address': s, 'hourly_rental': 5})
+    s = requests.post(url='http://parkingapp.bsyes82dni.us-east-1.elasticbeanstalk.com/sensor', data={'owner': ownerIDs[i], 'address': s, 'hourly_rental': randint(5, 10), 'start_bound': randint(1, 24), 'end_bound': randint(1, 24)})
     i += 1
 
 for c in customers:
