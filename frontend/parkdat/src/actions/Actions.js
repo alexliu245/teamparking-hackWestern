@@ -135,3 +135,44 @@ export const updateAvailableParkingSpots = (res) => {
         payload: res
     }
 }
+
+// /sensor POST
+export const postSensor = (ownerID, address, hourlyRental, startBound, endBound) => {
+    return {
+        type: 'POST_SENSOR',
+        payload: {ownerID: ownerID, address: address, hourlyRental: hourlyRental, startBound: startBound, endBound: endBound}
+    }
+}
+export const updatePostSensor = (res) => {
+    return {
+        type: 'UPDATE_POST_SENSOR',
+        payload: res
+    }
+}
+
+// /transactions GET
+export const getTransactionData = () => {
+    return {
+        type: 'GET_TRANSACTION_DATA',
+    }
+}
+export const updateTransactionData = (res) => {
+    return {
+        type: 'UPDATE_TRANSACTION_DATA',
+        payload: res
+    }
+}
+
+// /transactions/<owner_id> GET
+export const getTransactionDataWithID = (ownerID) => {
+    return {
+        type: 'GET_TRANSACTION_DATA_WITH_ID',
+        payload: ownerID
+    }
+}
+export const updateTransactionDataWithID = (res) => {
+    return {
+        type: 'UPDATE_TRANSACTION_DATA_WITH_ID',
+        payload: res
+    }
+}

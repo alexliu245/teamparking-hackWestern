@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "axios": "^0.17.1",
+    "qs": "^6.5.1",
     "google-maps-react": "^1.1.2",
     "react": "^16.1.1",
     "react-bootstrap": "^0.31.5",
