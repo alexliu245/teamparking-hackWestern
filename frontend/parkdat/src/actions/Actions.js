@@ -123,10 +123,10 @@ export const updateSensorAssignment = (res) => {
 }
 
 // /available-parking-spots-near?lat=x&lng=y
-export const availableParkingSpots = (lat, long) => {
+export const availableParkingSpots = (address) => {
     return {
         type: 'AVAILABLE_PARKING_SPOTS',
-        payload: {lat: lat, long: long}
+        payload: address
     }
 }
 export const updateAvailableParkingSpots = (res) => {

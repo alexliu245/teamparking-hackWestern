@@ -160,7 +160,7 @@ const availableParkingSpots = createLogic({
     type: "AVAILABLE_PARKING_SPOTS",
     async process({ getState, action, APIEndpoint }, dispatch, done) {
         try {
-            var result = await axios.get(APIEndpoint + "available-parking-spots-near?lat=" + action.payload.lat + "&lng=" + action.payload.long);
+            var result = await axios.get(APIEndpoint + "available-parking-spots-near?address_id=" + action.payload.address);
             dispatch(availableParkingSpots(result.data));
             done();
         } catch (err) {
