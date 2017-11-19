@@ -72,7 +72,7 @@ def get_sensor(id):
     if sensor is not None:
         sensor["_id"] = str(sensor["_id"])
         sensor["owner"] = str(sensor["owner"])
-        sensor["session"] = is_session_active(sensor)
+        sensor["session"] = is_place_available(sensor)
         return jsonify(sensor)
     else:
         return jsonify({})
@@ -89,7 +89,7 @@ def get_sensors():
                 if "assigned_customer" in sensor:
                     sensor.pop("assigned_customer")
                 sensor["owner"] = str(sensor["owner"])
-                sensor["session"] = is_session_active(sensor)
+                sensor["session"] = is_place_available(sensor)
                 results.append(sensor)
         return jsonify(results)
     else:
@@ -102,8 +102,8 @@ def register_sensor():
     sensor = sensors.insert_one({
         "owner": ObjectId(request.form["owner"]),
         "address": request.form["address"],
-        "start_bound": request.form["start_bound"],
-        "end_bound": request.form["end_bound"],
+        "start_bound": int(request.form["start_bound"]),
+        "end_bound": int(request.form["end_bound"]),
         "location": {"type": "Point", "coordinates": [loc["lng"], loc["lat"]]},
         "hourly_rental": float(request.form["hourly_rental"])
     })
@@ -185,30 +185,50 @@ def session(sensor_id):
 
 @application.route("/available-parking-spots-near", methods=["GET"])
 def available_parking_spots_near():
+    if request.args.get("lat") and request.args.get("lng"):
+        latitude = float(request.args.get("lat"))
+        longitude = float(request.args.get("lng"))
+    else:
+        location = try_get_geocode(request.args.get("address"))
+        latitude, longitude = location["lat"], location["lng"]
     geo_query = {
-     "location": {
-        "$near": {
-            "$geometry": {
-                "type": "Point",
-                "coordinates": [
-                        float(request.args.get("lng")),
-                        float(request.args.get("lat"))
-                ]
-            },
-            "$maxDistance": 500
-        }
+     "$and": [
+        {
+            "location": {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                                longitude,
+                                latitude
+                        ]
+                    },
+                    "$maxDistance": 50000
+                }
+            }
         },
-     "assigned_customer": {"$exists": False},
-     "start_time": {"$exists": False}
+        {
+         "assigned_customer": {"$exists": False}
+        },
+        {
+         "start_time": {"$exists": False}
+        }
+    ]
     }
+    if request.args.get("timebound") == False:
+        pass
+    else:
+        current_hour = datetime.now().hour
+        geo_query["$and"].append({"start_bound": {"$lte": current_hour}})
+        geo_query["$and"].append({"end_bound": {"$gte": current_hour}})
     sensors_ = sensors.find(geo_query)
     results = []
     if sensors_ is not None:
         for sensor in sensors_:
             if sensor is not None:
-                sensor.pop("_id")
+                sensor["_id"] = str(sensor["_id"])
                 if "assigned_customer" in sensor:
-                    sensor.pop("assigned_customer")
+                    sensor["assigned_customer"] = str(sensor["assigned_customer"])
                 sensor["owner"] = str(sensor["owner"])
                 results.append(sensor)
         return jsonify(results)
@@ -250,10 +270,7 @@ def try_get_geocode(address):
     try:
         return get_geocode(address)
     except:
-        return {
-            "type": "Point",
-            "coordinates": [42.9959, -81.2757]
-        }
+        return {"lat": 42.9959, "lng": -81.2757}
 
 
 def get_geocode(address):
@@ -344,7 +361,8 @@ def get_weather(lat, lng):
 
 
 def is_place_available(sensor):
-    if ("start_time" in sensor) and ("end_time" not in sensor):
+    current_hour = datetime.now().hour
+    if (("start_time" in sensor) and ("end_time" not in sensor)) or (current_hour < int(sensor["start_bound"]) or current_hour > int(sensor["end_bound"])):
         return "UNAVAILABLE"
     else:
         return "AVAILABLE"
