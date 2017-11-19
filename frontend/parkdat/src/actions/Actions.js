@@ -135,3 +135,17 @@ export const updateAvailableParkingSpots = (res) => {
         payload: res
     }
 }
+
+// /sensor POST
+export const postSensor = (ownerID, address, hourlyRental, startBound, endBound) => {
+    return {
+        type: 'POST_SENSOR',
+        payload: {ownerID: ownerID, address: address, hourlyRental: hourlyRental, startBound: startBound, endBound: endBound}
+    }
+}
+export const updatePostSensor = (res) => {
+    return {
+        type: 'UPDATE_POST_SENSOR',
+        payload: res
+    }
+}

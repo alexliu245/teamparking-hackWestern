@@ -8,7 +8,8 @@ const initialState = {
     customerDataWithID: [],
     customerToSensorData: [],
     releaseSensorData: [],
-    availableParkingSpotData: []
+    availableParkingSpotData: [],
+    postSensorData: []
 }
 
 // All entries must be paired with a "UPDATE_XXXX" action.
@@ -130,6 +131,17 @@ export default function actionsReducer(state = initialState, action) {
             return {
                 ...state,
                 availableParkingSpotData: action.payload
+            }
+
+        // /sensor POST
+        case 'POST_SENSOR':
+            return {
+                ...state
+            }
+        case 'UPDATE_POST_SENSOR':
+            return {
+                ...state,
+                postSensorData: action.payload
             }
     }
 }
