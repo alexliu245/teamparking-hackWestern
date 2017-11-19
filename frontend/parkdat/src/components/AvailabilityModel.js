@@ -8,7 +8,7 @@ import { selectAvailableParkingSpot }  from '../selectors';
 class AvailabilityModel extends PureComponent {
 	
 	componentDidMount(){
-    this.props.availableParkingSpots(this.props.lat, this.props.long);
+    this.props.availableParkingSpots(this.props.address);
   }
 	
 	render() {
@@ -28,7 +28,7 @@ const structuredSelector = createStructuredSelector({
 })
 const mapDispatchToProps = dispatch => {
   return {
-    availableParkingSpots: (lat, long) => dispatch(availableParkingSpots(lat, long))
+    availableParkingSpots: (address) => dispatch(availableParkingSpots(address))
   }       
 }
 
