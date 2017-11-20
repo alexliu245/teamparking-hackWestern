@@ -14,6 +14,7 @@ import '../App.css';
 var isCheckedIn = "false";
 var showCheckInButton = "displayNone";
 var customerID = "5a1182988113c9063dc1feb8";
+var sensorID = "5a1182998113c9063dc1febc";
 
 class Client extends React.Component {
   constructor(props) {
@@ -21,14 +22,15 @@ class Client extends React.Component {
       this.state = {
         searchedAddress: '',
         foundAddressArray: '',
+        foundAddressArray1: '',
         selectedLocation: '',
         selectedCoordinates: '',
         currentTime: '',
         customerID:'',
         sensorID:'',
         isCheckedIn: "false",
-        showCheckInButton: "displayNone",
-        showCheckOutButton: "displayNone",
+        showCheckInButton: "",
+        showCheckOutButton: "",
         showSearch:''
       };
       // this.getLocationsService = new getLocationsService();
@@ -48,7 +50,7 @@ class Client extends React.Component {
         showCheckInButton: "displayNone",
         showSearch: "displayNone"
       });
-      this.props.assignToSensor(this.state.customerID, this.state.sensorID )
+      this.props.assignToSensor(customerID, sensorID )
       // isCheckedIn = true;
       alert ("Checked into parking spot at " + this.state.selectedLocation + " at " + this.state.currentTime )
     }
@@ -84,7 +86,15 @@ class Client extends React.Component {
       event.preventDefault();
       // alert(this.state.searchedAddress)
       // this.props.getSensorData();
-      this.props.availableParkingSpots(this.state.searchedAddress)
+      var foundAddressArray = this.props.availableParkingSpots(this.state.searchedAddress);
+      // this.state.foundAddressArray = this.props.availableParkingSpots(this.state.searchedAddress);
+      this.setState({
+        selectedLocation: this.state.searchedAddress,
+        foundAddressArray1: this.state.foundAddressArray
+
+      });
+      console.log(JSON.stringify(this.state.foundAddressArray))
+      console.log(this.state.foundAddressArray1)
     }
 	render() {
     const style = {
@@ -125,10 +135,21 @@ class Client extends React.Component {
                   <div style={style}> <Gmap coordinates={this.state.selectedCoordinates} /></div>
 								<br /> <br /> <br />
 							</Col>
-				      <Col xs={12} md={4} lg={4}>
+				      <Col xs={12} md={4} lg={4} classType="displayNone">
 								<h3>Parking Spots Near You</h3>
+                {/* {this.state.foundAddress.type} */}
                 <div className= "overflow">
-                {this.props.availableParkingSpotData.map( ( res ) => {
+                  {this.state.foundAddressArray1.address}
+                  {this.state.foundAddressArray1.coordinates}
+                  {/* <AddressData
+                    location={this.state.foundAddressArray.address}
+                    // coordinates = {res.location.coordinates}
+                    // owner = {res.owner}
+                    // hourly_rental = {res.hourly_rental}
+                    // start_time = {res.start_time}
+                    // session = {res.session}
+                    callbackFromParent={this.myCallback} /> */}
+                {/* {this.props.availableParkingSpots(this.state.searchedAddress).map( ( res ) => {
                   return <div key={res.address}>
                     <AddressData
                       location={res.address}
@@ -140,7 +161,7 @@ class Client extends React.Component {
                       callbackFromParent={this.myCallback} />
                   </div>
                   })
-                } </div>
+                } </div> */}</div>
 							</Col>
 				    </Row>
   				</Grid>

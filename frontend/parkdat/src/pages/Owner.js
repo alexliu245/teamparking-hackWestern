@@ -64,8 +64,9 @@ class Owner extends React.Component {
     handleSubmit(event) {
       event.preventDefault();
       this.props.postSensor(this.state.ownerID, this.state.address, this.state.costPerHour, this.state.startTime, this.state.endTime)
-      alert('SUBMITTED:' + this.state.ownerID + ' ' + this.state.address);
+      // alert('SUBMITTED:' + this.state.ownerID + ' ' + this.state.address);
       this.close();
+      setTimeout(function() { window.location.reload(); }, 1000);
     }
 	render() {
     // console.log("OWNER PAGE -------")
